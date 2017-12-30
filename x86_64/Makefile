@@ -29,7 +29,7 @@ DEB_NAME = crystal_$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)_amd64.deb
 RPM_NAME = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).x86_64.rpm
 
 DOCKER_BUILD_ARGS = $(if $(no_cache),--no-cache )$(if $(pull_images),--pull )
-BUILD_ARGS = $(DOCKER_BUILD_ARGS)$(if $(release),--build-arg release=true )--build-arg crystal_version=$(CRYSTAL_VERSION) --build-arg shards_version=$(SHARDS_VERSION) --build-arg gc_version=$(GC_VERSION) --build-arg libatomic_ops_version=$(LIBATOMIC_OPS_VERSION) --build-arg libevent_version=$(LIBEVENT_VERSION) --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE)
+BUILD_ARGS = $(DOCKER_BUILD_ARGS)$(if $(release),--build-arg release=true )--build-arg crystal_version=$(CRYSTAL_VERSION) --build-arg shards_version=$(SHARDS_VERSION) --build-arg gc_version=$(GC_VERSION) --build-arg libatomic_ops_version=$(LIBATOMIC_OPS_VERSION) --build-arg libevent_version=$(LIBEVENT_VERSION) --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE) --build-arg package_iteration=$(PACKAGE_ITERATION)
 
 .PHONY: all
 all: compress package ## Build compressed omnibus and distribution packages [default]
@@ -58,7 +58,7 @@ $(OUTPUT_BASENAME).tar: Dockerfile $(FILES)
 	mkdir -p $(OUTPUT_DIR)
 	docker build $(BUILD_ARGS) -t crystal-build-temp .
 	container_id="$$(docker create crystal-build-temp)" \
-	  && docker cp "$$container_id":/output/crystal-$(CRYSTAL_VERSION).tar $(OUTPUT_BASENAME).tar \
+	  && docker cp "$$container_id":/output/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).tar $(OUTPUT_BASENAME).tar \
 	  && docker rm -v "$$container_id"
 
 .PHONY: compress
