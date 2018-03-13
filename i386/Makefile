@@ -15,7 +15,7 @@ CRYSTAL_VERSION ?= ## How the binaries should be branded
 CRYSTAL_SHA1 ?=    ## Git tag/branch/sha1 to checkout and build source
 PACKAGE_ITERATION = 1
 SHARDS_VERSION = v0.7.2
-PREVIOUS_CRYSTAL_RELEASE = https://github.com/crystal-lang/crystal/releases/download/v0.24.1/crystal-0.24.1-2-linux-i686.tar.gz
+PREVIOUS_CRYSTAL_RELEASE = http://192.168.0.102:8000/crystal-0.24.2-1-linux-i686.tar.gz
 
 GC_VERSION = v7.4.10
 LIBATOMIC_OPS_VERSION = v7.4.10

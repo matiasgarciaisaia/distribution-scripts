@@ -58,6 +58,10 @@ RUN apk add --no-cache \
 ARG release
 ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
 
+# Replace bash with busy-box to avoid a autoreconf bug with bash-4.4
+# See https://forums.docker.com/t/problem-of-hanging-autoreconf/41015/8
+RUN mv /bin/bash /bin/bash-real && ln -s /bin/sh /bin/bash
+
 # Build libgc (again, this time for musl)
 ARG gc_version
 ARG libatomic_ops_version
@@ -81,6 +85,9 @@ RUN git clone https://github.com/libevent/libevent \
  && ./configure --disable-debug --disable-shared \
  && make -j$(nproc)
 
+# Restore original bash
+RUN rm /bin/bash && mv /bin/bash-real /bin/bash
+
 ENV LIBRARY_PATH=/bdwgc/.libs/:/libevent/.libs/
 ENV PATH=/usr/lib/llvm4/bin:$PATH
 RUN llvm-config --version
@@ -101,7 +108,7 @@ RUN git clone https://github.com/crystal-lang/crystal \
  && touch src/compiler/crystal.cr \
  && make crystal stats=true static=true ${release:+release=true} \
                  CRYSTAL_CONFIG_VERSION=${crystal_version} \
-                 CRYSTAL_CONFIG_TARGET=x86_64-unknown-linux-gnu
+                 CRYSTAL_CONFIG_TARGET=i386-unknown-linux-gnu
 
 # Build shards
 ARG shards_version
@@ -111,7 +118,7 @@ RUN git clone https://github.com/crystal-lang/shards \
  \
  # Hack to make shards not segfault
  && echo 'require "llvm/lib_llvm"; require "llvm/enums"; require "./src/shards"' > hack.cr \
- && /crystal/bin/crystal build --stats --target x86_64-linux-musl \
+ && /crystal/bin/crystal build --stats --target i386-linux-musl \
     hack.cr -o shards --static ${release:+--release}
 
 COPY files/crystal-wrapper /output/bin/crystal
